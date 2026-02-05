@@ -1,4 +1,4 @@
-* {
+﻿* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -196,7 +196,6 @@ footer {
   margin-top: auto;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -225,7 +224,6 @@ footer {
   75% { transform: translateX(10px); }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   header {
     flex-direction: column;
@@ -282,7 +280,6 @@ footer {
   }
 }
 
-/* Utility Classes */
 .text-center {
   text-align: center;
 }
@@ -325,3 +322,4 @@ footer {
 .btn-edit:active {
   transform: translateY(0);
 }
+

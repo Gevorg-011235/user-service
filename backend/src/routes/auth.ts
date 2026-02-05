@@ -1,8 +1,8 @@
-﻿const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const verifyToken = require('../middleware/auth');
+﻿import express from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import verifyToken from '../middleware/auth.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -14,19 +14,19 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const cookieOptions = {
   httpOnly: true,
-  sameSite: 'lax',
+  sameSite: 'lax' as const,
   secure: isProduction,
   maxAge: 60 * 60 * 1000
 };
 
-const isValidEmail = (email) => {
+const isValidEmail = (email: unknown) => {
   if (!email || typeof email !== 'string') return false;
   const trimmed = email.trim();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(trimmed);
 };
 
-const isValidUsername = (username) => {
+const isValidUsername = (username: unknown) => {
   if (!username || typeof username !== 'string') return false;
   const trimmed = username.trim();
   if (trimmed.length < 3 || trimmed.length > 30) return false;
@@ -34,27 +34,25 @@ const isValidUsername = (username) => {
   return true;
 };
 
-const isValidPassword = (password) => {
+const isValidPassword = (password: unknown) => {
   return typeof password === 'string' && password.length >= 6;
 };
 
-const isValidFullName = (fullName) => {
+const isValidFullName = (fullName: unknown) => {
   if (!fullName || typeof fullName !== 'string') return false;
   const trimmed = fullName.trim();
   return trimmed.length >= 3 && trimmed.length <= 100;
 };
 
-const isValidBirthDate = (birthDate) => {
+const isValidBirthDate = (birthDate: unknown) => {
   if (!birthDate) return false;
-  const parsed = new Date(birthDate);
+  const parsed = new Date(String(birthDate));
   return !Number.isNaN(parsed.getTime());
 };
 
-// REGISTER
 router.post('/register', async (req, res) => {
   const { email, username, password, fullName, birthDate } = req.body;
 
-  // Проверка на пустые поля
   if (!email || !username || !password || !fullName || !birthDate) {
     return res.status(400).json({ message: 'Все поля обязательны' });
   }
@@ -64,7 +62,9 @@ router.post('/register', async (req, res) => {
   }
 
   if (!isValidUsername(username)) {
-    return res.status(400).json({ message: 'Имя пользователя должно быть от 3 до 30 символов без пробелов' });
+    return res
+      .status(400)
+      .json({ message: 'Имя пользователя должно быть от 3 до 30 символов без пробелов' });
   }
 
   if (!isValidPassword(password)) {
@@ -77,7 +77,6 @@ router.post('/register', async (req, res) => {
   }
 
   try {
-    // Проверка на существующий email или username
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Email или username уже зарегистрирован' });
@@ -91,13 +90,12 @@ router.post('/register', async (req, res) => {
       birthDate: parsedBirthDate,
       password: hashedPassword
     });
-    res.json({ message: 'Пользователь успешно зарегистрирован' });
+    return res.json({ message: 'Пользователь успешно зарегистрирован' });
   } catch (err) {
-    res.status(500).json({ message: 'Ошибка регистрации' });
+    return res.status(500).json({ message: 'Ошибка регистрации' });
   }
 });
 
-// LOGIN
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -123,60 +121,57 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Неверный пароль' });
     }
 
-    // JWT содержит userId, email и username
     const token = jwt.sign(
-      { userId: user._id, email: user.email, username: user.username },
+      { userId: user._id.toString(), email: user.email, username: user.username },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
     res.cookie('token', token, cookieOptions);
-    res.json({ email: user.email, username: user.username });
+    return res.json({ email: user.email, username: user.username });
   } catch (err) {
-    res.status(500).json({ message: 'Ошибка при входе' });
+    return res.status(500).json({ message: 'Ошибка при входе' });
   }
 });
 
-// LOGOUT
 router.post('/logout', (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     sameSite: 'lax',
     secure: isProduction
   });
-  res.json({ message: 'Вы вышли из системы' });
+  return res.json({ message: 'Вы вышли из системы' });
 });
 
-// GET PROFILE - получить данные профиля текущего пользователя
 router.get('/profile', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
+    const user = await User.findById(req.user?.userId).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'Пользователь не найден' });
     }
     if (!user.isActive) {
       return res.status(403).json({ message: 'Пользователь заблокирован' });
     }
-    res.json({
+    return res.json({
       email: user.email,
       username: user.username,
       fullName: user.fullName,
       birthDate: user.birthDate
     });
   } catch (err) {
-    res.status(500).json({ message: 'Ошибка при получении профиля' });
+    return res.status(500).json({ message: 'Ошибка при получении профиля' });
   }
 });
 
-// UPDATE PROFILE - обновить данные профиля
 router.put('/update-profile', verifyToken, async (req, res) => {
   try {
     const { email, username, password, fullName, birthDate } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user?.userId;
 
-    // Проверка пустых полей
     if (!email || !username || !fullName || !birthDate) {
-      return res.status(400).json({ message: 'Email, username, ФИО и дата рождения обязательны' });
+      return res
+        .status(400)
+        .json({ message: 'Email, username, ФИО и дата рождения обязательны' });
     }
 
     if (!isValidEmail(email)) {
@@ -184,7 +179,9 @@ router.put('/update-profile', verifyToken, async (req, res) => {
     }
 
     if (!isValidUsername(username)) {
-      return res.status(400).json({ message: 'Имя пользователя должно быть от 3 до 30 символов без пробелов' });
+      return res
+        .status(400)
+        .json({ message: 'Имя пользователя должно быть от 3 до 30 символов без пробелов' });
     }
 
     if (!isValidFullName(fullName)) {
@@ -195,7 +192,6 @@ router.put('/update-profile', verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Некорректная дата рождения' });
     }
 
-    // Проверка на уникальность email и username
     const existingUser = await User.findOne({
       $or: [{ email }, { username }],
       _id: { $ne: userId } // исключаем текущего пользователя
@@ -205,14 +201,19 @@ router.put('/update-profile', verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Email или username уже используется' });
     }
 
-    const updateData = {
+    const updateData: {
+      email: string;
+      username: string;
+      fullName: string;
+      birthDate: Date;
+      password?: string;
+    } = {
       email,
       username,
       fullName: fullName.trim(),
       birthDate: new Date(birthDate)
     };
 
-    // Если пользователь хочет изменить пароль
     if (password) {
       if (!isValidPassword(password)) {
         return res.status(400).json({ message: 'Пароль должен содержать минимум 6 символов' });
@@ -225,7 +226,7 @@ router.put('/update-profile', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Пользователь не найден' });
     }
 
-    res.json({
+    return res.json({
       message: 'Профиль успешно обновлен',
       email: user.email,
       username: user.username,
@@ -233,8 +234,9 @@ router.put('/update-profile', verifyToken, async (req, res) => {
       birthDate: user.birthDate
     });
   } catch (err) {
-    res.status(500).json({ message: 'Ошибка при обновлении профиля' });
+    return res.status(500).json({ message: 'Ошибка при обновлении профиля' });
   }
 });
 
-module.exports = router;
+export default router;
+

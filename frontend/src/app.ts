@@ -1,7 +1,22 @@
-﻿async function login() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const messageEl = document.getElementById('message');
+type AuthResponse = {
+  message?: string;
+};
+
+const getInputValue = (id: string): string => {
+  const el = document.getElementById(id) as HTMLInputElement | null;
+  return el ? el.value : '';
+};
+
+const getMessageEl = (): HTMLElement | null => {
+  return document.getElementById('message');
+};
+
+const login = async (): Promise<void> => {
+  const email = getInputValue('email');
+  const password = getInputValue('password');
+  const messageEl = getMessageEl();
+
+  if (!messageEl) return;
 
   if (!email || !password) {
     messageEl.innerText = 'Пожалуйста, заполните все поля';
@@ -16,26 +31,28 @@
       body: JSON.stringify({ email, password })
     });
 
-    const data = await res.json();
+    const data = (await res.json()) as AuthResponse;
 
     if (res.ok) {
       window.location.href = '../dashboard/dashboard.html';
     } else {
       messageEl.innerText = data.message || 'Ошибка входа';
     }
-  } catch (err) {
+  } catch {
     messageEl.innerText = 'Ошибка сети. Проверьте соединение.';
   }
-}
+};
 
-async function register() {
-  const fullName = document.getElementById('fullName').value;
-  const birthDate = document.getElementById('birthDate').value;
-  const email = document.getElementById('email').value;
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
-  const messageEl = document.getElementById('message');
+const register = async (): Promise<void> => {
+  const fullName = getInputValue('fullName');
+  const birthDate = getInputValue('birthDate');
+  const email = getInputValue('email');
+  const username = getInputValue('username');
+  const password = getInputValue('password');
+  const confirmPassword = getInputValue('confirmPassword');
+  const messageEl = getMessageEl();
+
+  if (!messageEl) return;
 
   if (!fullName || !birthDate || !email || !username || !password || !confirmPassword) {
     messageEl.innerText = 'Пожалуйста, заполните все поля';
@@ -77,7 +94,7 @@ async function register() {
       body: JSON.stringify({ fullName, birthDate, email, username, password })
     });
 
-    const data = await res.json();
+    const data = (await res.json()) as AuthResponse;
 
     if (res.ok) {
       messageEl.innerText = 'Регистрация успешна! Перенаправление...';
@@ -93,10 +110,22 @@ async function register() {
       messageEl.classList.add('error');
       messageEl.style.display = 'block';
     }
-  } catch (err) {
+  } catch {
     messageEl.innerText = 'Ошибка сети. Проверьте соединение.';
     messageEl.classList.remove('success');
     messageEl.classList.add('error');
     messageEl.style.display = 'block';
   }
+};
+
+declare global {
+  interface Window {
+    login: () => Promise<void>;
+    register: () => Promise<void>;
+  }
 }
+
+window.login = login;
+window.register = register;
+
+export {};

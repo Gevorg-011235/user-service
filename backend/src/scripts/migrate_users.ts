@@ -1,21 +1,14 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+﻿import mongoose from 'mongoose';
+import 'dotenv/config';
 
-const User = require('../models/User');
+import User from '../models/User.js';
 
 const MONGO_URI =
-  process.env.MONGO_URI ||
+  process.env.MONGO_URI ??
   'mongodb://root:password@mongo:27017/auth-demo?authSource=admin';
 
 async function migrateUsers() {
   await mongoose.connect(MONGO_URI);
-
-  const update = {
-    $set: {
-      role: 'user',
-      isActive: true
-    }
-  };
 
   const result = await User.updateMany(
     {
@@ -39,15 +32,17 @@ async function migrateUsers() {
   );
 
   console.log('Migration complete:', {
-    matched: result.matchedCount ?? result.n,
-    modified: result.modifiedCount ?? result.nModified
+    matched: (result as { matchedCount?: number; n?: number }).matchedCount ??
+      (result as { n?: number }).n,
+    modified: (result as { modifiedCount?: number; nModified?: number }).modifiedCount ??
+      (result as { nModified?: number }).nModified
   });
 
   await mongoose.disconnect();
 }
 
-migrateUsers()
-  .catch(err => {
-    console.error('Migration failed:', err);
-    process.exit(1);
-  });
+migrateUsers().catch(err => {
+  console.error('Migration failed:', err);
+  process.exit(1);
+});
+

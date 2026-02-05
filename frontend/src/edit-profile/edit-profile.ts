@@ -1,14 +1,27 @@
-﻿// Переход на страницу редактирования при клике
+type ProfileResponse = {
+  fullName?: string;
+  birthDate?: string;
+  username?: string;
+  email?: string;
+};
+
+type UpdateErrorResponse = {
+  message?: string;
+};
+
+const getInput = (id: string): HTMLInputElement | null => {
+  return document.getElementById(id) as HTMLInputElement | null;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   loadUserData();
 });
 
-function loadUserData() {
-  const statusDiv = document.getElementById('status');
-  const editForm = document.getElementById('editForm');
+function loadUserData(): void {
+  const statusDiv = document.getElementById('status') as HTMLElement | null;
+  const editForm = document.getElementById('editForm') as HTMLElement | null;
 
-  // Проверка на существование элементов
   if (!statusDiv || !editForm) {
     return;
   }
@@ -16,9 +29,8 @@ function loadUserData() {
   statusDiv.style.display = 'block';
   statusDiv.textContent = '⏳ Загрузка данных...';
 
-  // Добавляю timeout для предотвращения бесконечного ожидания
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   fetch('http://localhost:3000/api/auth/profile', {
     method: 'GET',
@@ -43,14 +55,14 @@ function loadUserData() {
       }
       return response.json();
     })
-    .then(data => {
+    .then((data: ProfileResponse) => {
       statusDiv.style.display = 'none';
       editForm.style.display = 'block';
 
-      const fullNameInput = document.getElementById('fullName');
-      const birthDateInput = document.getElementById('birthDate');
-      const usernameInput = document.getElementById('username');
-      const emailInput = document.getElementById('email');
+      const fullNameInput = getInput('fullName');
+      const birthDateInput = getInput('birthDate');
+      const usernameInput = getInput('username');
+      const emailInput = getInput('email');
 
       if (fullNameInput && birthDateInput && usernameInput && emailInput) {
         fullNameInput.value = data.fullName || '';
@@ -64,7 +76,7 @@ function loadUserData() {
         emailInput.value = data.email || '';
       }
     })
-    .catch(error => {
+    .catch((error: Error) => {
       clearTimeout(timeoutId);
 
       statusDiv.style.display = 'none';
@@ -77,7 +89,6 @@ function loadUserData() {
         return;
       }
 
-      // Определить тип ошибки
       let errorMessage = error.message;
       if (error.name === 'AbortError') {
         errorMessage = '❌ Timeout: Сервер не отвечает (проверьте, запущен ли Docker)';
@@ -89,35 +100,43 @@ function loadUserData() {
     });
 }
 
-function setupEventListeners() {
-  // Кнопка возврата на панель
-  document.getElementById('backBtn').addEventListener('click', () => {
-    window.location.href = '../dashboard/dashboard.html';
-  });
+function setupEventListeners(): void {
+  const backBtn = document.getElementById('backBtn') as HTMLButtonElement | null;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement | null;
+  const cancelBtn = document.getElementById('cancelBtn') as HTMLButtonElement | null;
+  const profileForm = document.getElementById('profileForm') as HTMLFormElement | null;
 
-  // Кнопка выхода
-  document.getElementById('logoutBtn').addEventListener('click', logout);
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      window.location.href = '../dashboard/dashboard.html';
+    });
+  }
 
-  // Кнопка отмены
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    window.location.href = '../dashboard/dashboard.html';
-  });
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', logout);
+  }
 
-  // Отправка формы
-  document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      window.location.href = '../dashboard/dashboard.html';
+    });
+  }
+
+  if (profileForm) {
+    profileForm.addEventListener('submit', handleProfileUpdate);
+  }
 }
 
-function handleProfileUpdate(e) {
+function handleProfileUpdate(e: Event): void {
   e.preventDefault();
 
-  const fullName = document.getElementById('fullName').value.trim();
-  const birthDate = document.getElementById('birthDate').value;
-  const username = document.getElementById('username').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
+  const fullName = getInput('fullName')?.value.trim() || '';
+  const birthDate = getInput('birthDate')?.value || '';
+  const username = getInput('username')?.value.trim() || '';
+  const email = getInput('email')?.value.trim() || '';
+  const password = getInput('password')?.value || '';
+  const confirmPassword = getInput('confirmPassword')?.value || '';
 
-  // Проверка валидации пароля
   if (password && password !== confirmPassword) {
     showError('Пароли не совпадают!');
     return;
@@ -128,7 +147,7 @@ function handleProfileUpdate(e) {
     return;
   }
 
-  const updateData = {
+  const updateData: Record<string, string> = {
     fullName,
     birthDate,
     username,
@@ -151,7 +170,7 @@ function handleProfileUpdate(e) {
           throw new Error('Токен истек. Пожалуйста, войдите заново.');
         }
         if (response.status === 400) {
-          return response.json().then(data => {
+          return response.json().then((data: UpdateErrorResponse) => {
             throw new Error(data.message || 'Ошибка при обновлении профиля');
           });
         }
@@ -159,61 +178,59 @@ function handleProfileUpdate(e) {
       }
       return response.json();
     })
-    .then(data => {
+    .then(() => {
       showSuccess('Профиль успешно обновлен!');
 
-      // Очистить поле пароля
-      document.getElementById('password').value = '';
-      document.getElementById('confirmPassword').value = '';
+      const passwordInput = getInput('password');
+      const confirmPasswordInput = getInput('confirmPassword');
+      if (passwordInput) passwordInput.value = '';
+      if (confirmPasswordInput) confirmPasswordInput.value = '';
 
-      // Перенаправить на панель через 2 секунды с форсированием обновления
       setTimeout(() => {
         window.location.href = '../dashboard/dashboard.html?updated=true';
       }, 2000);
     })
-    .catch(error => {
+    .catch((error: Error) => {
       showError(error.message);
     });
 }
 
-function showSuccess(message) {
-  const successDiv = document.getElementById('successMessage');
+function showSuccess(message: string): void {
+  const successDiv = document.getElementById('successMessage') as HTMLElement | null;
+  if (!successDiv) return;
   successDiv.textContent = '✓ ' + message;
   successDiv.style.display = 'block';
 }
 
-function showError(message) {
-  const errorDiv = document.getElementById('errorMessage');
-  const errorContainer = document.getElementById('errorContainer');
-  const statusDiv = document.getElementById('status');
+function showError(message: string): void {
+  const errorDiv = document.getElementById('errorMessage') as HTMLElement | null;
+  const errorContainer = document.getElementById('errorContainer') as HTMLElement | null;
+  const statusDiv = document.getElementById('status') as HTMLElement | null;
 
-  // Скрыть статус если он видим
   if (statusDiv) {
     statusDiv.style.display = 'none';
   }
 
-  // Попытаться показать ошибку в форме
   if (errorDiv) {
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
   } else if (errorContainer) {
-    // Иначе показать в контейнере ошибок
     errorContainer.textContent = message;
     errorContainer.style.display = 'block';
   } else {
-    // Если элементов нет - вывести в alert
     alert(message);
   }
 }
 
-async function logout() {
+async function logout(): Promise<void> {
   try {
     await fetch('http://localhost:3000/api/auth/logout', {
       method: 'POST',
       credentials: 'include'
     });
-  } catch (err) {
-    // игнорируем ошибку выхода
+  } catch {
   }
   window.location.href = '../login/login.html';
 }
+
+export {};

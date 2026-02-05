@@ -1,9 +1,14 @@
 {
   "scripts": {
     "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
     "start": "vite"
   },
   "dependencies": {
     "vite": "^7.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
   }
 }
