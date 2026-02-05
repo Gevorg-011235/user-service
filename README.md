@@ -113,18 +113,37 @@ npm run dev
 - `express-rate-limit` (200 запросов / 15 мин)
 - `httpOnly` cookie для JWT
 
-## Git и сдача на проверку
-Рекомендуемый формат сдачи — ссылка на репозиторий:
-```bash
-git init
-git add .
-git commit -m "User service (TЗ)"
-git branch -M main
-git remote add origin <your_repo_url>
-git push -u origin main
-```
+
 
 ## Docker image (опционально)
-Сейчас проект запускается через `docker-compose` с официальными образами `node:20`.  
-Если требуется **собственный Docker image**, нужен `Dockerfile` (не включён по умолчанию).
-Могу добавить Dockerfile и шаги сборки, если нужно.
+Dockerfile для backend и frontend:
+- `backend/Dockerfile`
+- `frontend/Dockerfile`
+
+Сборка образов:
+```bash
+docker build -t user-service-backend ./backend
+docker build -t user-service-frontend ./frontend
+```
+
+Запуск образов (без compose):
+```bash
+docker run -p 3000:3000 --env-file ./backend/.env user-service-backend
+docker run -p 5173:5173 user-service-frontend
+```
+
+## Деплой (кратко)
+**Вариант 1: Docker Compose**
+```bash
+docker compose up -d --build
+```
+
+**Вариант 2: Docker images**
+1. Собрать образы как выше
+2. Задать переменные окружения (`JWT_SECRET`, `MONGO_URI`)
+3. Запустить контейнеры
+
+В проде рекомендуется:
+- HTTPS
+- `sameSite: "none"` и `secure: true` для cookie
+- отдельный MongoDB (managed или self-hosted)
