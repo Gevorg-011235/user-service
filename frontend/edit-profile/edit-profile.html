@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование профиля</title>
+  <link rel="stylesheet" href="edit-profile.css">
+</head>
+<body>
+  <header>
+    <h1>Редактирование профиля</h1>
+    <nav>
+      <button id="backBtn" aria-label="Вернуться на панель">← Вернуться</button>
+      <button id="logoutBtn" aria-label="Выход из системы">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="status" role="status" aria-live="polite" style="display: none;">⏳ Загрузка данных...</div>
+
+    <div id="editForm" style="display: none;">
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="fullName">ФИО:</label>
+          <input type="text" id="fullName" name="fullName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="birthDate">Дата рождения:</label>
+          <input type="date" id="birthDate" name="birthDate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Новый пароль (оставьте пустым, если не хотите менять):</label>
+          <input type="password" id="password" name="password">
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Подтвердите пароль:</label>
+          <input type="password" id="confirmPassword" name="confirmPassword">
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="btn-save">💾 Сохранить изменения</button>
+          <button type="button" id="cancelBtn" class="btn-cancel">❌ Отмена</button>
+        </div>
+
+        <div id="successMessage" class="message success" style="display: none;"></div>
+        <div id="errorMessage" class="message error" style="display: none;"></div>
+      </form>
+    </div>
+
+    <div id="errorContainer" style="display: none;"></div>
+  </main>
+
+  <footer>© 2026 Auth App | Защита данных и приватность</footer>
+
+  <script src="../app.js"></script>
+  <script src="edit-profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "dev": "vite --host",
+    "start": "vite"
+  },
+  "dependencies": {
+    "vite": "^7.3.1"
+  }
+}

@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header>
+    <h1>Dashboard</h1>
+    <nav>
+      <button id="logoutBtn" aria-label="Выход из системы">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="status" role="status" aria-live="polite">⏳ Проверка авторизации...</div>
+
+    <div id="userInfo" style="display: none;">
+      <div class="user-card">
+        <h2>Профиль пользователя</h2>
+        <p>ФИО: <span id="userFullName"></span></p>
+        <p>Дата рождения: <span id="userBirthDate"></span></p>
+        <p>Email: <span id="userEmail"></span></p>
+        <p>Username: <span id="userUsername"></span></p>
+        <p>Роль: <span id="userRole"></span></p>
+        <p>Статус: <span id="userStatus"></span></p>
+        <p id="welcomeMessage"></p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>📊 Активность</h3>
+          <p>Отслеживайте свою активность в системе. Все ваши действия записываются в журнал для безопасности.</p>
+        </div>
+
+        <div class="card">
+          <h3>⚙️ Настройки</h3>
+          <p>Управляйте своими предпочтениями и параметрами аккаунта через панель управления.</p>
+          <button id="editProfileBtn" class="btn-edit">Редактировать профиль</button>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Последний вход</div>
+          <div class="stat-value" id="lastLogin">-</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-label">Дата регистрации</div>
+          <div class="stat-value" id="registrationDate">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="errorMessage" style="display: none;"></div>
+  </main>
+
+  <footer>© 2026 Auth App | Защита данных и приватность</footer>
+
+  <script src="../app.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

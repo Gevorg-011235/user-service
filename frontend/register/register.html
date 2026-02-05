@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="register.css">
+</head>
+<body>
+  <div class="register-container">
+    <h2>Регистрация</h2>
+    <div class="form-group">
+      <label for="fullName">ФИО:</label>
+      <input id="fullName" type="text" placeholder="Иванов Иван Иванович">
+    </div>
+    <div class="form-group">
+      <label for="birthDate">Дата рождения:</label>
+      <input id="birthDate" type="date">
+    </div>
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input id="email" type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label for="username">Имя пользователя:</label>
+      <input id="username" type="text" placeholder="Придумайте имя пользователя">
+    </div>
+    <div class="form-group">
+      <label for="password">Пароль:</label>
+      <input id="password" type="password" placeholder="Введите пароль">
+    </div>
+    <div class="form-group">
+      <label for="confirmPassword">Подтвердите пароль:</label>
+      <input id="confirmPassword" type="password" placeholder="Подтвердите пароль">
+    </div>
+    <button onclick="register()">Зарегистрироваться</button>
+    <div id="message"></div>
+    <div class="login-link">
+      Уже есть аккаунт? <a href="../login/login.html">Войти</a>
+    </div>
+  </div>
+
+  <script src="../app.js"></script>
+</body>
+</html>
