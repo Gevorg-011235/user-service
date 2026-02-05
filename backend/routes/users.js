@@ -23,7 +23,7 @@ router.use(async (req, res, next) => {
   }
 });
 
-// GET /api/users/:id — admin или сам
+// GET /api/users/:id 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {

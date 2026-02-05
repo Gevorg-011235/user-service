@@ -10,7 +10,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // теперь req.user.email существует
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(403).json({ message: 'Неверный токен' });
