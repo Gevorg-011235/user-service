@@ -1,4 +1,4 @@
-# User Service (Fullstack Node.js + TypeScript)
+Ôªø# User Service (Fullstack Node.js + TypeScript)
 
 User management service for the assignment: registration, authentication, roles, status, profile management, and admin access. The project is a fullstack app and includes:
 - backend on Node.js + Express + TypeScript + MongoDB
@@ -7,16 +7,17 @@ User management service for the assignment: registration, authentication, roles,
 ## Implemented Features
 - User model: **full name**, **birth date**, **email (unique)**, **password**, **role (admin/user)**, **status (active)**.
 - Endpoints:
-  - `POST /api/auth/register` ó register
-  - `POST /api/auth/login` ó login
-  - `GET /api/users/:id` ó get a user (admin or self)
-  - `GET /api/users` ó list users (admin only)
-  - `PATCH /api/users/:id/block` ó block user (admin or self)
+  - `POST /api/auth/register` ‚Äî register
+  - `POST /api/auth/login` ‚Äî login
+  - `GET /api/users/:id` ‚Äî get a user (admin or self)
+  - `GET /api/users` ‚Äî list users (admin only)
+  - `PATCH /api/users/:id/block` ‚Äî block user (admin or self)
+  - `PATCH /api/users/:id/unblock` ‚Äî unblock user (admin or self)
 - Additional:
-  - `GET /api/auth/profile` ó current user profile
-  - `PUT /api/auth/update-profile` ó update profile
-  - `POST /api/auth/logout` ó logout
-  - `GET /api/dashboard` ó protected route
+  - `GET /api/auth/profile` ‚Äî current user profile
+  - `PUT /api/auth/update-profile` ‚Äî update profile
+  - `POST /api/auth/logout` ‚Äî logout
+  - `GET /api/dashboard` ‚Äî protected route
 
 ## Tech Stack
 - **Backend:** Node.js, Express, TypeScript, Mongoose, JWT (httpOnly cookies), CORS, Helmet, Rate Limiting
@@ -25,9 +26,9 @@ User management service for the assignment: registration, authentication, roles,
 - **Docker:** docker-compose (node:20 for frontend and backend)
 
 ## Project Structure
-- `backend/` ó API, models, middleware, migrations
-- `frontend/` ó static pages + JS
-- `docker-compose.yml` ó infra startup
+- `backend/` ‚Äî API, models, middleware, migrations
+- `frontend/` ‚Äî static pages + JS
+- `docker-compose.yml` ‚Äî infra startup
 
 ## User Model
 ```json
@@ -52,6 +53,7 @@ File: `backend/.env`
 ```
 JWT_SECRET=super_long_random_value
 MONGO_URI=mongodb://root:password@mongo:27017/auth-demo?authSource=admin
+ADMIN_KEY=change_me_admin_key
 ```
 
 ## Quick Start (Docker)
@@ -88,7 +90,8 @@ npm run dev
   "birthDate": "1995-04-12",
   "email": "user@example.com",
   "username": "ivan95",
-  "password": "secret123"
+  "password": "secret123",
+  "adminKey": "optional_admin_key"
 }
 ```
 
@@ -109,6 +112,14 @@ npm run dev
 
 ### Block User (admin or self)
 `PATCH /api/users/:id/block`
+
+### Unblock User (admin or self)
+`PATCH /api/users/:id/unblock`
+
+## Admin Panel (Frontend)
+- On the login page you can check **‚ÄúGo to admin panel after login‚Äù**.
+- If the user role is **admin**, it redirects to `admin-dashboard`.
+- If the user is not admin, it shows a notice and goes to the regular dashboard.
 
 ## Security
 - `helmet()` for basic headers
@@ -140,7 +151,7 @@ docker compose up -d --build
 
 **Option 2: Docker images**
 1. Build images as above
-2. Set environment variables (`JWT_SECRET`, `MONGO_URI`)
+2. Set environment variables (`JWT_SECRET`, `MONGO_URI`, `ADMIN_KEY`)
 3. Run containers
 
 For production, recommended:

@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not set');
 }
+const ADMIN_KEY = process.env.ADMIN_KEY;
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -51,7 +52,7 @@ const isValidBirthDate = (birthDate: unknown) => {
 };
 
 router.post('/register', async (req, res) => {
-  const { email, username, password, fullName, birthDate } = req.body;
+  const { email, username, password, fullName, birthDate, adminKey } = req.body;
 
   if (!email || !username || !password || !fullName || !birthDate) {
     return res.status(400).json({ message: 'Все поля обязательны' });
@@ -82,13 +83,20 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Email или username уже зарегистрирован' });
     }
 
+    if (adminKey) {
+      if (!ADMIN_KEY || adminKey !== ADMIN_KEY) {
+        return res.status(403).json({ message: 'Неверный admin key' });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({
       email,
       username,
       fullName: fullName.trim(),
       birthDate: parsedBirthDate,
-      password: hashedPassword
+      password: hashedPassword,
+      role: adminKey ? 'admin' : 'user'
     });
     return res.json({ message: 'Пользователь успешно зарегистрирован' });
   } catch (err) {
@@ -194,7 +202,7 @@ router.put('/update-profile', verifyToken, async (req, res) => {
 
     const existingUser = await User.findOne({
       $or: [{ email }, { username }],
-      _id: { $ne: userId } // исключаем текущего пользователя
+      _id: { $ne: userId } 
     });
 
     if (existingUser) {

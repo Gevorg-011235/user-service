@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <nav>
+      <button id="backToUser">Пользовательский дашборд</button>
+      <button id="logoutBtn" aria-label="Выход из системы">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <div id="status" role="status" aria-live="polite">⏳ Загрузка пользователей...</div>
+
+    <div id="adminContent" style="display: none;">
+      <div class="panel">
+        <h2>Список пользователей</h2>
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>ФИО</th>
+              <th>Email</th>
+              <th>Username</th>
+              <th>Роль</th>
+              <th>Статус</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody id="usersTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="errorMessage" style="display: none;"></div>
+  </main>
+
+  <footer>© 2026 Auth App | Admin Panel</footer>
+
+  <script type="module" src="admin-dashboard.ts"></script>
+</body>
+</html>

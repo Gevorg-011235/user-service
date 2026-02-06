@@ -14,6 +14,8 @@ const getMessageEl = (): HTMLElement | null => {
 const login = async (): Promise<void> => {
   const email = getInputValue('email');
   const password = getInputValue('password');
+  const loginAsAdmin =
+    (document.getElementById('loginAsAdmin') as HTMLInputElement | null)?.checked ?? false;
   const messageEl = getMessageEl();
 
   if (!messageEl) return;
@@ -34,6 +36,33 @@ const login = async (): Promise<void> => {
     const data = (await res.json()) as AuthResponse;
 
     if (res.ok) {
+      if (loginAsAdmin) {
+        try {
+          const roleRes = await fetch('http://localhost:3000/api/dashboard', {
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          if (roleRes.ok) {
+            const roleData = (await roleRes.json()) as { role?: string };
+            if (roleData.role === 'admin') {
+              window.location.href = '../admin-dashboard/admin-dashboard.html';
+              return;
+            }
+            if (messageEl) {
+              messageEl.innerText = 'Нет админ‑доступа. Открываю обычный кабинет...';
+              messageEl.classList.remove('success');
+              messageEl.classList.add('error');
+              messageEl.style.display = 'block';
+            }
+            setTimeout(() => {
+              window.location.href = '../dashboard/dashboard.html';
+            }, 1500);
+            return;
+          }
+        } catch {
+          // fallback to normal dashboard
+        }
+      }
       window.location.href = '../dashboard/dashboard.html';
     } else {
       messageEl.innerText = data.message || 'Ошибка входа';
@@ -46,6 +75,7 @@ const login = async (): Promise<void> => {
 const register = async (): Promise<void> => {
   const fullName = getInputValue('fullName');
   const birthDate = getInputValue('birthDate');
+  const adminKey = getInputValue('adminKey');
   const email = getInputValue('email');
   const username = getInputValue('username');
   const password = getInputValue('password');
@@ -91,7 +121,14 @@ const register = async (): Promise<void> => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ fullName, birthDate, email, username, password })
+      body: JSON.stringify({
+        fullName,
+        birthDate,
+        email,
+        username,
+        password,
+        adminKey: adminKey || undefined
+      })
     });
 
     const data = (await res.json()) as AuthResponse;
