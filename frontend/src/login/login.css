@@ -34,6 +34,24 @@ h2 {
   margin-bottom: 20px;
 }
 
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.checkbox-group label {
+  margin: 0;
+  font-weight: 500;
+  color: #555;
+}
+
 label {
   display: block;
   margin-bottom: 8px;

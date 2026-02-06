@@ -314,6 +314,10 @@ footer {
   width: 100%;
 }
 
+.btn-admin {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+}
+
 .btn-edit:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
@@ -321,5 +325,17 @@ footer {
 
 .btn-edit:active {
   transform: translateY(0);
+}
+
+.admin-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #0f172a;
+  color: #e2e8f0;
+  vertical-align: middle;
 }
 

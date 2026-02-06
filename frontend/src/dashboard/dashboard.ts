@@ -1,4 +1,4 @@
-type DashboardResponse = {
+﻿type DashboardResponse = {
   email?: string;
   username?: string;
   fullName?: string;
@@ -15,10 +15,12 @@ const userBirthDateEl = document.getElementById('userBirthDate') as HTMLElement 
 const userEmailEl = document.getElementById('userEmail') as HTMLElement | null;
 const userUsernameEl = document.getElementById('userUsername') as HTMLElement | null;
 const userRoleEl = document.getElementById('userRole') as HTMLElement | null;
+const adminNoteEl = document.getElementById('adminNote') as HTMLElement | null;
 const userStatusEl = document.getElementById('userStatus') as HTMLElement | null;
 const errorMessageEl = document.getElementById('errorMessage') as HTMLElement | null;
 const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement | null;
 const editProfileBtn = document.getElementById('editProfileBtn') as HTMLButtonElement | null;
+const adminPanelBtn = document.getElementById('adminPanelBtn') as HTMLButtonElement | null;
 
 if (statusEl && userInfoEl && errorMessageEl && logoutBtn) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -64,8 +66,14 @@ if (statusEl && userInfoEl && errorMessageEl && logoutBtn) {
       if (userRoleEl) {
         userRoleEl.innerText = data.role || 'user';
       }
+      if (adminNoteEl) {
+        adminNoteEl.style.display = data.role === 'admin' ? 'inline' : 'none';
+      }
       if (userStatusEl) {
         userStatusEl.innerText = data.isActive === false ? 'Заблокирован' : 'Активен';
+      }
+      if (adminPanelBtn && data.role === 'admin') {
+        adminPanelBtn.style.display = 'block';
       }
       if (data.message) {
         const messageEl = document.createElement('p');
@@ -104,6 +112,12 @@ if (statusEl && userInfoEl && errorMessageEl && logoutBtn) {
   if (editProfileBtn) {
     editProfileBtn.addEventListener('click', () => {
       window.location.href = '../edit-profile/edit-profile.html';
+    });
+  }
+
+  if (adminPanelBtn) {
+    adminPanelBtn.addEventListener('click', () => {
+      window.location.href = '../admin-dashboard/admin-dashboard.html';
     });
   }
 }
